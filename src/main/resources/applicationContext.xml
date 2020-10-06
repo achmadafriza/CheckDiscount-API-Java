@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="dataSource"
+          class = "org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name = "driverClassName" value = "com.mysql.jdbc.Driver"/>
+        <property name = "url" value = "jdbc:mysql://localhost:3306/challengespe"/>
+        <property name = "username" value = "root"/>
+        <property name = "password" value = ""/>
+    </bean>
+
+    <bean id="APILogJDBCTemplate"
+          class="com.api.model.template.APILogJDBCTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="TransactionLogJDBCTemplate"
+          class="com.api.model.template.TransactionLogJDBCTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="TransactionTierJDBCTemplate"
+          class="com.api.model.template.TransactionTierJDBCTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="OTPLogJDBCTemplate"
+          class="com.api.model.template.OTPLogJDBCTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="Models"
+          class="com.api.controller.ModelDI">
+        <property name="APILogDB" ref="APILogJDBCTemplate"/>
+        <property name="TransactionLogDB" ref="TransactionLogJDBCTemplate"/>
+        <property name="TierDB" ref="TransactionTierJDBCTemplate"/>
+        <property name="OTPLogDB" ref="OTPLogJDBCTemplate"/>
+    </bean>
+
+    <bean id="CheckDiscount"
+          class="com.api.controller.CheckDiscount">
+        <property name="models" ref="Models"/>
+    </bean>
+
+    <bean id="OTP"
+          class="com.api.controller.OTP">
+        <property name="models" ref="Models"/>
+    </bean>
+
+    <bean id="CheckDiscountAspect"
+          class="com.api.controller.advice.CheckDiscountAspect"/>
+    <bean id="CheckSignatureAspect"
+          class="com.api.controller.advice.CheckSignatureAspect"/>
+    <bean id="GlobalExceptionHandler"
+          class="com.api.controller.advice.APIGlobalExceptionHandler"/>
+    <bean id="LoggingAspect"
+          class="com.api.controller.advice.LoggingAspect">
+        <property name="APILogDB" ref="APILogJDBCTemplate"/>
+    </bean>
+</beans>
